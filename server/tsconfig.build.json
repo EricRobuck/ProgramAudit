@@ -1,0 +1,4 @@
+{
+  "extends": "./tsconfig.json",
+  "include": ["src", "migrations", "scripts/migrate.ts", "scripts/seed.ts", "scripts/backup.ts", "scripts/create-admin.ts"]
+}

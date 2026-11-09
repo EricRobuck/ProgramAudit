@@ -1,0 +1,11 @@
+**/node_modules
+**/dist
+.data
+.env
+.env.*
+!.env.example
+deploy/.env.production
+server/test-output
+e2e-out
+.git
+*.log

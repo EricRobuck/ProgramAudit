@@ -1,0 +1,82 @@
+# ProgramAudit — isolated deployment definition (NOT yet deployed).
+# Review docs/DEPLOYMENT_PLAN.md before use. Every name here is ProgramAudit-
+# specific so nothing collides with the existing application's containers,
+# networks or volumes. The database publishes no ports. The app binds only to
+# 127.0.0.1 on a host port chosen after read-only discovery of occupied ports.
+#
+#   cd deploy && cp .env.production.example .env.production   # fill in values
+#   docker compose -p programaudit --env-file .env.production up -d programaudit-db
+#   docker compose -p programaudit --env-file .env.production run --rm programaudit-app node server/dist/scripts/migrate.js latest
+#   docker compose -p programaudit --env-file .env.production up -d programaudit-app
+
+name: programaudit
+
+services:
+  programaudit-db:
+    image: postgres:17.6-bookworm
+    container_name: programaudit-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: programaudit
+      POSTGRES_USER: programaudit
+      POSTGRES_PASSWORD: ${PROGRAMAUDIT_DB_PASSWORD:?set PROGRAMAUDIT_DB_PASSWORD}
+    volumes:
+      - programaudit_pgdata:/var/lib/postgresql/data
+      - programaudit_backups:/backups
+    networks:
+      - programaudit_internal
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U programaudit -d programaudit']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+    logging:
+      driver: json-file
+      options: { max-size: '10m', max-file: '5' }
+
+  programaudit-app:
+    build:
+      context: ..
+    image: programaudit:${PROGRAMAUDIT_VERSION:-local}
+    container_name: programaudit-app
+    restart: unless-stopped
+    depends_on:
+      programaudit-db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 4100
+      DATABASE_URL: postgres://programaudit:${PROGRAMAUDIT_DB_PASSWORD}@programaudit-db:5432/programaudit
+      SESSION_SECRET: ${PROGRAMAUDIT_SESSION_SECRET:?set PROGRAMAUDIT_SESSION_SECRET}
+      APP_ORIGIN: ${PROGRAMAUDIT_ORIGIN:?set PROGRAMAUDIT_ORIGIN, e.g. https://programaudit.example.edu}
+      COOKIE_SECURE: 'true'
+      TRUST_PROXY: 'true'
+    ports:
+      # Loopback only; the existing reverse proxy (or a new ProgramAudit-only one) forwards HTTPS traffic here.
+      - '127.0.0.1:${PROGRAMAUDIT_HOST_PORT:?choose an unused host port}:4100'
+    networks:
+      - programaudit_internal
+      - programaudit_edge
+    deploy:
+      resources:
+        limits:
+          cpus: '1.00'
+          memory: 512M
+    logging:
+      driver: json-file
+      options: { max-size: '10m', max-file: '5' }
+
+networks:
+  programaudit_internal:
+    internal: true
+  programaudit_edge: {}
+
+volumes:
+  programaudit_pgdata:
+  programaudit_backups:
