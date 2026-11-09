@@ -16,6 +16,8 @@ services:
     image: postgres:17.6-bookworm
     container_name: programaudit-db
     restart: unless-stopped
+    # Small footprint: this host also runs the Linux exam server and its student containers.
+    command: ['postgres', '-c', 'shared_buffers=64MB', '-c', 'max_connections=30', '-c', 'work_mem=4MB']
     environment:
       POSTGRES_DB: programaudit
       POSTGRES_USER: programaudit
@@ -30,11 +32,15 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    # Low CPU priority and preferred OOM victim, so exam containers always win contention.
+    cpu_shares: 256
+    oom_score_adj: 500
+    memswap_limit: 256M
     deploy:
       resources:
         limits:
           cpus: '0.50'
-          memory: 512M
+          memory: 256M
     logging:
       driver: json-file
       options: { max-size: '10m', max-file: '5' }
@@ -57,17 +63,21 @@ services:
       APP_ORIGIN: ${PROGRAMAUDIT_ORIGIN:?set PROGRAMAUDIT_ORIGIN, e.g. https://programaudit.example.edu}
       COOKIE_SECURE: 'true'
       TRUST_PROXY: 'true'
+      NODE_OPTIONS: --max-old-space-size=256
     ports:
       # Loopback only; the existing reverse proxy (or a new ProgramAudit-only one) forwards HTTPS traffic here.
       - '127.0.0.1:${PROGRAMAUDIT_HOST_PORT:?choose an unused host port}:4100'
     networks:
       - programaudit_internal
       - programaudit_edge
+    cpu_shares: 256
+    oom_score_adj: 500
+    memswap_limit: 384M
     deploy:
       resources:
         limits:
-          cpus: '1.00'
-          memory: 512M
+          cpus: '0.75'
+          memory: 384M
     logging:
       driver: json-file
       options: { max-size: '10m', max-file: '5' }
