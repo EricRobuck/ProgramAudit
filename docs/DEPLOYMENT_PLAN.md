@@ -1,7 +1,13 @@
 # Isolated deployment plan (for owner review)
 
-**Status: NOT deployed. No connection was made to 18.219.232.76, and nothing
-on that server was inspected or changed.** This plan needs the owner's written
+**Status (2026-11-09): DEPLOYED** at https://programaudit.18-219-232-76.sslip.io
+following this plan, with owner authorization. The grading software (Linux
+Practical Exam server) passed every before/after check. See
+[SERVER_INVENTORY.md](SERVER_INVENTORY.md) for what was found, what was added,
+the check results, and the steps still awaiting approval. The plan below is
+kept as the reference procedure.
+
+~~Original status: NOT deployed.~~ This plan needs the owner's written
 authorization, server access credentials, and a routing decision before any
 step in §5 is carried out. Nothing here may stop, restart, reconfigure or
 overwrite the existing application at `https://18-219-232-76.sslip.io/`.

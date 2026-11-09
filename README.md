@@ -8,9 +8,9 @@ complete their assigned narratives.
 Workflow: **Curriculum → Major → Review → Past / Present / Future trees → assign
 faculty → write and complete responses → compile report (preview, DOCX, PDF).**
 
-> Status: first release, built and tested locally with synthetic data.
-> **Not deployed.** See [docs/DEPLOYMENT_PLAN.md](docs/DEPLOYMENT_PLAN.md) for the
-> isolated deployment plan and the decisions still needed from the owner.
+> Status: first release, deployed 2026-11-09 at https://programaudit.18-219-232-76.sslip.io,
+> isolated from the Linux exam server on the same host. See
+> [docs/SERVER_INVENTORY.md](docs/SERVER_INVENTORY.md) and [docs/DEPLOYMENT_PLAN.md](docs/DEPLOYMENT_PLAN.md).
 
 ## Stack
 

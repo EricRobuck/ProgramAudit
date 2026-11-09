@@ -29,7 +29,7 @@ These run against a real PostgreSQL database through the full HTTP stack
 | AT-16 snapshot unchanged after later edits | `reports.test.ts` AT-15/16 | Pass |
 | AT-17 guessed identifiers rejected | `security.test.ts` AT-17 | Pass |
 | AT-18 backup restored into isolated database | `backup.test.ts` | Pass |
-| AT-19 isolation before/after deployment | Not applicable: no deployment authorized. Checklist in DEPLOYMENT_PLAN.md §6 | Pending |
+| AT-19 isolation before/after deployment | Deployed 2026-11-09; checks recorded in SERVER_INVENTORY.md | Pass |
 
 Additional checks: CSRF rejection, XSS sanitization, inactive-account sign-out,
 last-admin protection, revision immutability triggers, archived-review
